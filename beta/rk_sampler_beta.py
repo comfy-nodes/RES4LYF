@@ -2104,9 +2104,14 @@ def sample_rk_beta(
     #progress_bar.close()
     RK.update_transformer_options({'update_cross_attn':  None})
     if step == len(sigmas)-2 and sigmas[-1] == 0 and sigmas[-2] == NS.sigma_min and not INIT_SAMPLE_LOOP:
-        eps, denoised = RK(x, NS.sigma_min, x, NS.sigma_min)
-        x = denoised
-        #progress_bar.update(1)
+        if EO("skip_final_model_call"):
+            sigma_min = NS.sigma_min.view(x.shape[:1] + (1,) * (x.ndim - 1)).to(x)
+            denoised  = model.inner_model.inner_model.model_sampling.calculate_denoised(sigma_min, eps, x)
+            x = denoised
+        else:
+            eps, denoised = RK(x, NS.sigma_min, x, NS.sigma_min)
+            x = denoised
+            #progress_bar.update(1)
 
     eps      = eps     .to(model_device)
     denoised = denoised.to(model_device)
