@@ -2165,6 +2165,11 @@ def sample_rk_beta(
         state_info_out['data_prev_y_']      = data_prev_y_
         state_info_out['data_prev_x_']      = data_prev_x_
 
+        if noise_initial is not None:
+            state_info_out['noise_initial'] = noise_initial.to('cpu')
+        if image_initial is not None:
+            state_info_out['image_initial'] = image_initial.to('cpu')
+
         if FLOW_STARTED and not FLOW_STOPPED:
             state_info_out['y0']           = y0.to('cpu') 
             #state_info_out['y0_inv']       = y0_inv.to('cpu')       # TODO: implement this?
